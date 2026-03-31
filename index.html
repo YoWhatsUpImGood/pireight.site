@@ -2,819 +2,702 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pireight — Private</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PIREIGHT PROJECT — YWU</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --black: #0a0a0a;
-      --white: #f5f5f0;
-      --grey-dark: #1a1a1a;
-      --grey-mid: #2e2e2e;
-      --grey-light: #888;
-      --border: #2e2e2e;
-      --error: #ff4444;
-      --success: #44ff88;
+      --bg: #080808;
+      --fg: #f0f0f0;
+      --mid: #555;
+      --dim: #222;
+      --border: #2a2a2a;
+      --accent: #ffffff;
+      --subtle: #999;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      background: var(--black);
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      min-height: 100vh;
-      overflow-x: hidden;
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'IBM Plex Mono', monospace;
+      overflow: hidden;
     }
 
+    /* ── SCANLINE OVERLAY ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── NOISE TEXTURE ── */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
       pointer-events: none;
-      z-index: 0;
+      z-index: 9998;
       opacity: 0.4;
     }
 
-    #site-gate {
-      position: fixed;
-      inset: 0;
-      background: var(--black);
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
+    /* ── LAYOUT ── */
+    #app {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      height: 100vh;
     }
 
-    .gate-box {
-      border: 1px solid var(--border);
-      padding: 3rem;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      animation: fadeUp 0.6s ease both;
-    }
-
-    .gate-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 3.5rem;
-      letter-spacing: 0.1em;
-      margin-bottom: 0.25rem;
-    }
-
-    .gate-sub {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      color: var(--grey-light);
-      margin-bottom: 2.5rem;
-    }
-
-    .gate-input {
-      width: 100%;
-      background: var(--grey-dark);
-      border: 1px solid var(--border);
-      color: var(--white);
-      padding: 0.9rem 1rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 1rem;
-      outline: none;
-      margin-bottom: 1rem;
-      text-align: center;
-      letter-spacing: 0.15em;
-      transition: border-color 0.2s;
-    }
-
-    .gate-input:focus { border-color: var(--white); }
-
-    .gate-btn {
-      width: 100%;
-      padding: 1rem;
-      background: var(--white);
-      color: var(--black);
-      border: none;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .gate-btn:hover { background: #ccc; }
-    .gate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .gate-error {
-      margin-top: 1rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--error);
-      min-height: 1.2rem;
-    }
-
-    #site-main { display: none; }
-
+    /* ── HEADER ── */
     header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
+      border-bottom: 1px solid var(--border);
+      padding: 0 2.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1.5rem 3rem;
-      border-bottom: 1px solid var(--border);
-      background: rgba(10,10,10,0.92);
-      backdrop-filter: blur(12px);
-    }
-
-    .logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.8rem;
-      letter-spacing: 0.15em;
-      color: var(--white);
-      text-decoration: none;
-    }
-
-    .logo span {
-      color: var(--grey-light);
-      font-size: 0.9rem;
-      font-family: 'DM Mono', monospace;
-      font-weight: 300;
-      letter-spacing: 0.2em;
-      margin-left: 0.75rem;
-      vertical-align: middle;
-    }
-
-    nav a {
-      color: var(--grey-light);
-      text-decoration: none;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-left: 2rem;
-      transition: color 0.2s;
-    }
-
-    nav a:hover { color: var(--white); }
-
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8rem 3rem 4rem;
+      height: 64px;
       position: relative;
     }
 
-    .hero-grid {
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+      gap: 3px;
+    }
+
+    .site-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.12em;
+      color: var(--fg);
+    }
+
+    .site-sub {
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      color: var(--subtle);
+      text-transform: uppercase;
+    }
+
+    .header-right {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--subtle);
+      text-align: right;
+    }
+
+    .header-right span {
+      display: block;
+      color: var(--fg);
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    /* corner deco */
+    header::before {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 3px;
+      height: 3px;
+      background: var(--fg);
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      right: 0;
+      width: 3px;
+      height: 3px;
+      background: var(--fg);
+    }
+
+    /* ── TABS ── */
+    .tabs-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      padding: 0 2.5rem;
+      gap: 0;
+    }
+
+    .tab {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      color: var(--subtle);
+      border-right: 1px solid var(--border);
+      transition: color 0.15s, background 0.15s;
+      position: relative;
+      user-select: none;
+    }
+
+    .tab:first-child { border-left: 1px solid var(--border); }
+
+    .tab:hover { color: var(--fg); background: var(--dim); }
+
+    .tab.active {
+      color: var(--fg);
+      background: var(--dim);
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--fg);
+    }
+
+    /* ── MAIN CONTENT ── */
+    main {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page {
+      display: none;
+      height: 100%;
+    }
+
+    .page.active { display: flex; }
+
+    /* ── HOME PAGE ── */
+    #page-home {
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 2rem;
+      padding: 3rem;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .home-glitch {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 12vw, 9rem);
+      letter-spacing: 0.05em;
+      line-height: 0.9;
+      position: relative;
+      color: var(--fg);
+    }
+
+    .home-glitch::before,
+    .home-glitch::after {
+      content: attr(data-text);
       position: absolute;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 60px 60px;
+      clip-path: polygon(0 25%, 100% 25%, 100% 45%, 0 45%);
+    }
+
+    .home-glitch::before {
+      color: #fff;
+      transform: translateX(-3px);
+      animation: glitch1 4s infinite steps(1);
+    }
+
+    .home-glitch::after {
+      color: #ccc;
+      transform: translateX(3px);
+      clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%);
+      animation: glitch2 4s infinite steps(1);
+    }
+
+    @keyframes glitch1 {
+      0%, 90%, 100% { opacity: 0; transform: translateX(0); }
+      92% { opacity: 1; transform: translateX(-4px); clip-path: polygon(0 20%, 100% 20%, 100% 38%, 0 38%); }
+      94% { opacity: 1; transform: translateX(2px); clip-path: polygon(0 50%, 100% 50%, 100% 65%, 0 65%); }
+      96% { opacity: 0; }
+    }
+
+    @keyframes glitch2 {
+      0%, 90%, 100% { opacity: 0; }
+      93% { opacity: 1; transform: translateX(4px); }
+      95% { opacity: 0; }
+    }
+
+    .home-desc {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      color: var(--subtle);
+      text-transform: uppercase;
+      max-width: 400px;
+    }
+
+    .home-divider {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, var(--mid), transparent);
+    }
+
+    .home-author {
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      color: var(--subtle);
+      text-transform: uppercase;
+    }
+
+    .home-author strong {
+      color: var(--fg);
+    }
+
+    .home-about {
+      max-width: 480px;
+      font-size: 0.7rem;
+      line-height: 1.9;
+      color: var(--subtle);
+      text-align: center;
+      border: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      position: relative;
+    }
+
+    .home-about::before {
+      content: '// ABOUT';
+      position: absolute;
+      top: -0.5rem;
+      left: 1.2rem;
+      font-size: 0.5rem;
+      letter-spacing: 0.3em;
+      background: var(--bg);
+      padding: 0 0.4rem;
+      color: var(--mid);
+    }
+
+    .home-about strong { color: var(--fg); }
+
+    /* ── PROJECTS PAGE ── */
+    #page-projects {
+      flex-direction: column;
+      overflow: hidden;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .projects-header {
+      padding: 1.5rem 2.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .projects-header h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.1em;
+      line-height: 1;
+    }
+
+    .projects-count {
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      color: var(--subtle);
+    }
+
+    .projects-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .projects-scroll::-webkit-scrollbar { width: 4px; }
+    .projects-scroll::-webkit-scrollbar-track { background: var(--bg); }
+    .projects-scroll::-webkit-scrollbar-thumb { background: var(--mid); }
+
+    /* ─── PROJECT CARD ─── */
+    .project-card {
+      border: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1.5rem;
+      align-items: start;
+      transition: border-color 0.2s, background 0.2s;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--fg);
+      opacity: 0;
+      transition: opacity 0.2s;
       pointer-events: none;
     }
 
-    .hero-content {
-      text-align: center;
-      position: relative;
-      z-index: 1;
-      max-width: 800px;
-    }
+    .project-card:hover { border-color: var(--fg); }
+    .project-card:hover::before { opacity: 0.02; }
 
-    .hero-tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--grey-light);
-      border: 1px solid var(--border);
-      display: inline-block;
-      padding: 0.4rem 1rem;
-      margin-bottom: 2rem;
-      animation: fadeUp 0.8s ease both;
-    }
-
-    h1 {
+    .project-index {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(5rem, 12vw, 10rem);
-      line-height: 0.9;
-      letter-spacing: 0.04em;
-      color: var(--white);
-      animation: fadeUp 0.8s ease 0.1s both;
-    }
-
-    h1 em { font-style: normal; color: var(--grey-light); }
-
-    .hero-sub {
-      font-size: 1rem;
-      color: var(--grey-light);
-      max-width: 480px;
-      margin: 2rem auto 3rem;
-      line-height: 1.7;
-      animation: fadeUp 0.8s ease 0.2s both;
-    }
-
-    .hero-cta {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      animation: fadeUp 0.8s ease 0.3s both;
-    }
-
-    .btn {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 0.9rem 2.5rem;
-      border: 1px solid var(--white);
-      background: var(--white);
-      color: var(--black);
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-      transition: all 0.2s;
-    }
-
-    .btn:hover { background: transparent; color: var(--white); }
-    .btn-outline { background: transparent; color: var(--white); }
-    .btn-outline:hover { background: var(--white); color: var(--black); }
-
-    .features {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      position: relative;
-      z-index: 1;
-    }
-
-    .feature { padding: 3rem; border-right: 1px solid var(--border); }
-    .feature:last-child { border-right: none; }
-
-    .feature-num {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 3rem;
-      color: var(--grey-mid);
+      font-size: 2.5rem;
       line-height: 1;
-      margin-bottom: 1rem;
+      color: var(--border);
+      user-select: none;
+      min-width: 3rem;
+      text-align: right;
     }
 
-    .feature h3 {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
+    .project-body { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .project-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.08em;
+      line-height: 1;
+    }
+
+    .project-desc {
+      font-size: 0.65rem;
+      line-height: 1.7;
+      color: var(--subtle);
+      max-width: 55ch;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+
+    .tag {
+      font-size: 0.5rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--white);
-      margin-bottom: 0.75rem;
-    }
-
-    .feature p { font-size: 0.875rem; color: var(--grey-light); line-height: 1.7; }
-
-    .auth-section {
-      padding: 6rem 3rem;
-      display: flex;
-      justify-content: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .auth-container { width: 100%; max-width: 480px; }
-
-    .auth-tabs {
-      display: flex;
       border: 1px solid var(--border);
-      margin-bottom: 2rem;
+      padding: 0.2rem 0.5rem;
+      color: var(--subtle);
     }
 
-    .auth-tab {
-      flex: 1;
-      padding: 1rem;
-      background: none;
-      border: none;
-      color: var(--grey-light);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
+    .project-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.4rem;
+      font-size: 0.55rem;
       letter-spacing: 0.15em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-      border-right: 1px solid var(--border);
+      color: var(--mid);
+      white-space: nowrap;
     }
 
-    .auth-tab:last-child { border-right: none; }
-    .auth-tab.active { background: var(--white); color: var(--black); }
-    .auth-form { display: none; }
-    .auth-form.active { display: block; }
-    .form-group { margin-bottom: 1.25rem; }
+    .project-status {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
 
-    label {
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--fg);
+    }
+
+    .status-dot.active {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── CONTACT PAGE ── */
+    #page-contact {
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .contact-wrap {
+      width: min(500px, 90vw);
+    }
+
+    .contact-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+      margin-bottom: 2.5rem;
+      line-height: 1;
+    }
+
+    .contact-heading span {
       display: block;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--grey-light);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      color: var(--subtle);
       margin-bottom: 0.5rem;
     }
 
-    input[type="email"],
-    input[type="password"],
-    input[type="text"] {
-      width: 100%;
-      background: var(--grey-dark);
-      border: 1px solid var(--border);
-      color: var(--white);
-      padding: 0.85rem 1rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.875rem;
-      outline: none;
+    .contact-row {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      align-items: center;
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border);
+      gap: 1.5rem;
+    }
+
+    .contact-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--mid);
+    }
+
+    .contact-value {
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      color: var(--fg);
+    }
+
+    .contact-value a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
       transition: border-color 0.2s;
     }
 
-    input:focus { border-color: var(--white); }
+    .contact-value a:hover { border-color: var(--fg); }
 
-    .invite-hint {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--grey-light);
-      margin-top: 0.4rem;
-      letter-spacing: 0.05em;
-    }
-
-    .tos-group {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .tos-group input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      margin-top: 2px;
-      accent-color: var(--white);
-      flex-shrink: 0;
-      cursor: pointer;
-    }
-
-    .tos-group label {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.8rem;
-      letter-spacing: 0;
-      text-transform: none;
-      color: var(--grey-light);
-      line-height: 1.5;
-      cursor: pointer;
-    }
-
-    .tos-group label a { color: var(--white); text-decoration: underline; text-underline-offset: 3px; }
-
-    .form-btn {
-      width: 100%;
-      padding: 1rem;
-      background: var(--white);
-      color: var(--black);
-      border: 1px solid var(--white);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
+    .contact-note {
+      margin-top: 2rem;
+      font-size: 0.55rem;
       letter-spacing: 0.2em;
+      color: var(--mid);
       text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
     }
 
-    .form-btn:hover { background: transparent; color: var(--white); }
-    .form-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .msg {
-      margin-top: 1rem;
-      padding: 0.75rem 1rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.05em;
-      display: none;
+    /* ── CURSOR BLINK ── */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--fg);
+      vertical-align: middle;
+      margin-left: 4px;
+      animation: blink 1.1s step-end infinite;
     }
 
-    .msg.error { border: 1px solid var(--error); color: var(--error); display: block; }
-    .msg.success { border: 1px solid var(--success); color: var(--success); display: block; }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      z-index: 200;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      backdrop-filter: blur(4px);
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
 
-    .modal-overlay.open { display: flex; }
-
-    .modal {
-      background: var(--grey-dark);
-      border: 1px solid var(--border);
-      max-width: 640px;
-      width: 100%;
-      max-height: 80vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-header {
-      padding: 1.5rem 2rem;
-      border-bottom: 1px solid var(--border);
+    /* ── STATUS BAR ── */
+    .status-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    .modal-header h2 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.5rem;
-      letter-spacing: 0.1em;
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      color: var(--grey-light);
-      font-size: 1.5rem;
-      cursor: pointer;
-      transition: color 0.2s;
-      line-height: 1;
-    }
-
-    .modal-close:hover { color: var(--white); }
-    .modal-body { padding: 2rem; overflow-y: auto; flex: 1; }
-
-    .modal-body h3 {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.75rem;
+      padding: 0 2.5rem;
+      height: 28px;
+      border-top: 1px solid var(--border);
+      font-size: 0.5rem;
       letter-spacing: 0.2em;
+      color: var(--mid);
       text-transform: uppercase;
-      color: var(--white);
-      margin: 1.5rem 0 0.75rem;
     }
 
-    .modal-body h3:first-child { margin-top: 0; }
-    .modal-body p, .modal-body li { font-size: 0.85rem; color: var(--grey-light); line-height: 1.8; }
-    .modal-body ul { padding-left: 1.25rem; margin-top: 0.5rem; }
-    .modal-body li { margin-bottom: 0.4rem; }
-
-    .modal-footer {
-      padding: 1.25rem 2rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem 3rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    footer p {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      color: var(--grey-light);
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 768px) {
-      header { padding: 1.25rem 1.5rem; }
-      nav { display: none; }
-      .hero { padding: 7rem 1.5rem 3rem; }
-      .features { grid-template-columns: 1fr; }
-      .feature { border-right: none; border-bottom: 1px solid var(--border); }
-      .feature:last-child { border-bottom: none; }
-      .auth-section { padding: 4rem 1.5rem; }
-      footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .status-bar .dot {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--fg);
+      margin-right: 6px;
+      animation: pulse 3s infinite;
     }
   </style>
 </head>
 <body>
+<div id="app">
 
-  <!-- Password Gate -->
-  <div id="site-gate">
-    <div class="gate-box">
-      <div class="gate-logo">Pireight</div>
-      <div class="gate-sub">// Private Access Only</div>
-      <input type="password" class="gate-input" id="gate-password" placeholder="Enter password" autocomplete="off" />
-      <button class="gate-btn" id="gate-btn" onclick="checkGate()">Enter</button>
-      <div class="gate-error" id="gate-error"></div>
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <div class="site-name">PIREIGHT PROJECT</div>
+      <div class="site-sub">Personal Portfolio</div>
     </div>
+
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs-bar">
+    <div class="tab active" data-target="home">// Home</div>
+    <div class="tab" data-target="projects">// Projects</div>
+    <div class="tab" data-target="contact">// Contact</div>
   </div>
 
-  <!-- Main Site -->
-  <div id="site-main">
+  <!-- MAIN -->
+  <main>
 
-    <header>
-      <a href="#" class="logo">Pireight<span>// PROXY</span></a>
-      <nav>
-        <a href="#features">Features</a>
-        <a href="#auth">Sign Up</a>
-        <a href="#" onclick="openTOS()">Terms</a>
-      </nav>
-    </header>
-
-    <section class="hero">
-      <div class="hero-grid"></div>
-      <div class="hero-content">
-        <div class="hero-tag">// Invite Only — Secure — Accountable</div>
-        <h1>Pire<em>ight</em></h1>
-        <p class="hero-sub">A private proxy network by invitation only. Every connection tied to a verified account. Every request logged. Clean by design.</p>
-        <div class="hero-cta">
-          <a href="#auth" class="btn">Create Account</a>
-          <a href="#" class="btn btn-outline" onclick="openTOS()">Read Terms</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="features" id="features">
-      <div class="feature">
-        <div class="feature-num">01</div>
-        <h3>Invite Only</h3>
-        <p>Access is by invitation only. Every user is personally vetted before receiving an invite code to create an account.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-num">02</div>
-        <h3>Token Auth</h3>
-        <p>Access is granted via unique per-account tokens. Tokens can be revoked instantly for any violation of our terms.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-num">03</div>
-        <h3>Content Filtering</h3>
-        <p>Known illegal and malicious destinations are blocked at the network level. Abuse reports are acted on immediately.</p>
-      </div>
-    </section>
-
-    <section class="auth-section" id="auth">
-      <div class="auth-container">
-        <div class="auth-tabs">
-          <button class="auth-tab active" onclick="switchTab('signup', this)">Sign Up</button>
-          <button class="auth-tab" onclick="switchTab('login', this)">Log In</button>
-        </div>
-
-        <!-- Signup -->
-        <div class="auth-form active" id="form-signup">
-          <div class="form-group">
-            <label>Invite Code</label>
-            <input type="text" id="signup-invite" placeholder="XXXX-XXXX-XXXX" autocomplete="off" style="text-transform:uppercase;letter-spacing:0.15em;" />
-            <div class="invite-hint">You need an invite code to create an account.</div>
-          </div>
-          <div class="form-group">
-            <label>Email Address</label>
-            <input type="email" id="signup-email" placeholder="you@example.com" />
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="signup-password" placeholder="Min. 8 characters" />
-          </div>
-          <div class="form-group">
-            <label>Confirm Password</label>
-            <input type="password" id="signup-confirm" placeholder="Repeat password" />
-          </div>
-          <div class="tos-group">
-            <input type="checkbox" id="tos-check" />
-            <label for="tos-check">I have read and agree to the <a href="#" onclick="openTOS(); return false;">Terms of Service</a>. I understand that illegal activity is strictly prohibited and will result in immediate account termination and reporting to authorities.</label>
-          </div>
-          <button class="form-btn" onclick="handleSignup()">Create Account</button>
-          <div class="msg" id="signup-msg"></div>
-        </div>
-
-        <!-- Login -->
-        <div class="auth-form" id="form-login">
-          <div class="form-group">
-            <label>Email Address</label>
-            <input type="email" id="login-email" placeholder="you@example.com" />
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="login-password" placeholder="Your password" />
-          </div>
-          <button class="form-btn" onclick="handleLogin()">Log In</button>
-          <div class="msg" id="login-msg"></div>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      <p>© 2026 Pireight.site — Invite Only</p>
-      <p><a href="#" onclick="openTOS()" style="color:var(--grey-light);text-decoration:none;">Terms of Service</a></p>
-    </footer>
-
-  </div>
-
-  <!-- TOS Modal -->
-  <div class="modal-overlay" id="tos-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>Terms of Service</h2>
-        <button class="modal-close" onclick="closeTOS()">✕</button>
-      </div>
-      <div class="modal-body">
-        <h3>1. Acceptance</h3>
-        <p>By creating an account on Pireight.site ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service.</p>
-        <h3>2. Account Responsibility</h3>
-        <p>You are solely responsible for all activity that occurs under your account. Your account is personal and non-transferable. You must not share your credentials or token with any other person.</p>
-        <h3>3. Prohibited Activities</h3>
-        <p>The following activities are strictly prohibited and will result in immediate account termination and reporting to law enforcement:</p>
-        <ul>
-          <li>Accessing, distributing, or transmitting child sexual abuse material (CSAM) in any form</li>
-          <li>Conducting or facilitating any form of cyberattack, including DDoS attacks, hacking, or unauthorized system access</li>
-          <li>Distributing malware, ransomware, spyware, or any malicious software</li>
-          <li>Fraud, phishing, or identity theft of any kind</li>
-          <li>Trafficking of illegal goods or substances</li>
-          <li>Harassment, stalking, or threatening any individual</li>
-          <li>Copyright infringement at scale or for commercial gain</li>
-          <li>Any activity that violates local, state, federal, or international law</li>
-        </ul>
-        <h3>4. Logging & Privacy</h3>
-        <p>All connections made through the Service are logged and associated with your verified account. Logs are retained for a minimum of 90 days and will be provided to law enforcement upon valid legal request.</p>
-        <h3>5. Cooperation with Law Enforcement</h3>
-        <p>Pireight.site will fully cooperate with any valid legal process. We reserve the right to proactively report suspected illegal activity without prior notice.</p>
-        <h3>6. Account Termination</h3>
-        <p>We reserve the right to suspend or terminate any account at any time for any violation of these Terms without prior notice.</p>
-        <h3>7. Disclaimer</h3>
-        <p>The Service is provided "as is" without warranty of any kind. Use at your own risk.</p>
-        <h3>8. Changes to Terms</h3>
-        <p>We reserve the right to update these Terms at any time. Last updated: March 2026.</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" onclick="closeTOS()">Close</button>
+    <!-- HOME -->
+    <div id="page-home" class="page active">
+      <div class="home-glitch" data-text="PIREIGHT">PIREIGHT</div>
+      <div class="home-divider"></div>
+      <div class="home-author">Operated by <strong>YWU</strong> &amp; <strong>VOID</strong></div>
+      <div class="home-about">
+        <strong>PIREIGHT PROJECT</strong> is a two-person independent dev studio
+        built around creative, technical, and experimental work. We build things
+        that blend hacker culture with hands-on craftsmanship — from custom hardware
+        and cybersecurity tools to games and personal software. No corporate polish,
+        just raw builds and real projects.
       </div>
     </div>
+
+    <!-- PROJECTS -->
+    <div id="page-projects" class="page">
+      <div class="projects-header">
+        <h2>PROJECTS<span class="cursor"></span></h2>
+        <div class="projects-count" id="proj-count">01 LOGGED</div>
+      </div>
+      <div class="projects-scroll" id="project-list">
+        <!-- ─────────────────────────────────────────────────────────────────
+             ADD PROJECTS HERE — copy one <div class="project-card"> block
+             and paste it below the last one. Update the index, name, desc,
+             tags, status, and year fields.
+             ───────────────────────────────────────────────────────────────── -->
+
+        <div class="project-card">
+          <div class="project-index">01</div>
+          <div class="project-body">
+            <div class="project-name">PIR8 CYBERDECK</div>
+            <div class="project-desc">
+              A physical cyberdeck build using a ThinkPad E420 housed in a gun case,
+              powered by a Raspberry Pi 5 running Kali Linux. Equipped with HackRF SDR
+              and LoRa modules for RF experimentation and off-grid comms. Full build
+              documented on GitHub Pages.
+            </div>
+            <div class="project-tags">
+              <span class="tag">Hardware</span>
+              <span class="tag">Kali Linux</span>
+              <span class="tag">Raspberry Pi</span>
+              <span class="tag">SDR</span>
+              <span class="tag">LoRa</span>
+            </div>
+          </div>
+          <div class="project-meta">
+            <div class="project-status">
+              <div class="status-dot active"></div>
+              <span>Active</span>
+            </div>
+            <div>2025</div>
+          </div>
+        </div>
+
+        <!-- ─── PASTE NEW PROJECT CARDS BELOW THIS LINE ─── -->
+
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div id="page-contact" class="page">
+      <div class="contact-wrap">
+        <div class="contact-heading">
+          <span>// reach out</span>
+          CONTACT
+        </div>
+
+        <div class="contact-row">
+          <div class="contact-label">YWU</div>
+          <div class="contact-value">yowhatsup</div>
+        </div>
+
+        <div class="contact-row">
+          <div class="contact-label">VOID</div>
+          <div class="contact-value">lil_skittle_</div>
+        </div>
+
+        <div class="contact-note">// Discord handles · PIREIGHT PROJECT</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div><span class="dot"></span><span id="status-text">SYSTEM ONLINE</span></div>
+    <div id="clock"></div>
   </div>
 
-  <script>
-    const WORKER = "https://proxy-auth.ywuidg19.workers.dev";
+</div>
 
-    // ── Gate ──────────────────────────────────────────────────
-    window.addEventListener("DOMContentLoaded", function() {
-      if (sessionStorage.getItem("pireight_site_auth") === "true") {
-        showSite();
-      }
-      document.getElementById("gate-password").focus();
-      document.getElementById("gate-password").addEventListener("keydown", function(e) {
-        if (e.key === "Enter") checkGate();
-      });
-      document.getElementById("tos-modal").addEventListener("click", function(e) {
-        if (e.target === this) closeTOS();
-      });
+<script>
+  // ── TAB NAVIGATION ──
+  const tabs = document.querySelectorAll('.tab');
+  const pages = document.querySelectorAll('.page');
 
-      // Auto format invite code input
-      document.getElementById("signup-invite").addEventListener("input", function() {
-        let val = this.value.replace(/[^A-Z0-9]/gi, "").toUpperCase();
-        if (val.length > 4) val = val.slice(0, 4) + "-" + val.slice(4);
-        if (val.length > 9) val = val.slice(0, 9) + "-" + val.slice(9);
-        if (val.length > 14) val = val.slice(0, 14);
-        this.value = val;
-      });
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.target;
+      tabs.forEach(t => t.classList.remove('active'));
+      pages.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('page-' + target).classList.add('active');
+
+      const statuses = {
+        home: 'HOME MODULE',
+        projects: 'PROJECT LOG',
+        contact: 'CONTACT MODULE'
+      };
+      document.getElementById('status-text').textContent = statuses[target] || 'SYSTEM ONLINE';
     });
+  });
 
-    async function checkGate() {
-      const password = document.getElementById("gate-password").value;
-      const btn = document.getElementById("gate-btn");
-      const err = document.getElementById("gate-error");
-      if (!password) return;
-      btn.disabled = true;
-      btn.textContent = "Checking...";
-      err.textContent = "";
-      try {
-        const res = await fetch(WORKER + "/api/site-login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password })
-        });
-        if (res.ok) {
-          sessionStorage.setItem("pireight_site_auth", "true");
-          showSite();
-        } else {
-          err.textContent = "Incorrect password.";
-          document.getElementById("gate-password").value = "";
-          document.getElementById("gate-password").focus();
-        }
-      } catch (e) {
-        err.textContent = "Connection error. Try again.";
-      }
-      btn.disabled = false;
-      btn.textContent = "Enter";
-    }
+  // ── PROJECT COUNT ──
+  function updateCount() {
+    const cards = document.querySelectorAll('.project-card').length;
+    const padded = String(cards).padStart(2, '0');
+    document.getElementById('proj-count').textContent = padded + ' LOGGED';
+  }
+  updateCount();
 
-    function showSite() {
-      document.getElementById("site-gate").style.display = "none";
-      document.getElementById("site-main").style.display = "block";
-      document.title = "Pireight — Secure Proxy Network";
-    }
-
-    function switchTab(tab, el) {
-      document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".auth-form").forEach(f => f.classList.remove("active"));
-      document.getElementById("form-" + tab).classList.add("active");
-      el.classList.add("active");
-    }
-
-    function openTOS() {
-      document.getElementById("tos-modal").classList.add("open");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeTOS() {
-      document.getElementById("tos-modal").classList.remove("open");
-      document.body.style.overflow = "";
-    }
-
-    function showMsg(id, type, text) {
-      const el = document.getElementById(id);
-      el.className = "msg " + type;
-      el.textContent = text;
-    }
-
-    async function handleSignup() {
-      const invite = document.getElementById("signup-invite").value.trim();
-      const email = document.getElementById("signup-email").value.trim();
-      const password = document.getElementById("signup-password").value;
-      const confirm = document.getElementById("signup-confirm").value;
-      const tos = document.getElementById("tos-check").checked;
-
-      if (!invite) return showMsg("signup-msg", "error", "An invite code is required.");
-      if (!email || !password || !confirm) return showMsg("signup-msg", "error", "All fields are required.");
-      if (password.length < 8) return showMsg("signup-msg", "error", "Password must be at least 8 characters.");
-      if (password !== confirm) return showMsg("signup-msg", "error", "Passwords do not match.");
-      if (!tos) return showMsg("signup-msg", "error", "You must agree to the Terms of Service.");
-
-      const btn = document.querySelector("#form-signup .form-btn");
-      btn.disabled = true;
-      btn.textContent = "Creating account...";
-
-      try {
-        const res = await fetch(WORKER + "/api/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, invite })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          showMsg("signup-msg", "success", "✓ Account created. Check your email to verify your address.");
-        } else {
-          showMsg("signup-msg", "error", data.error || "Signup failed. Try again.");
-        }
-      } catch (e) {
-        showMsg("signup-msg", "error", "Network error. Please try again.");
-      }
-
-      btn.disabled = false;
-      btn.textContent = "Create Account";
-    }
-
-    async function handleLogin() {
-      const email = document.getElementById("login-email").value.trim();
-      const password = document.getElementById("login-password").value;
-      if (!email || !password) return showMsg("login-msg", "error", "All fields are required.");
-
-      const btn = document.querySelector("#form-login .form-btn");
-      btn.disabled = true;
-      btn.textContent = "Logging in...";
-
-      try {
-        const res = await fetch(WORKER + "/api/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          showMsg("login-msg", "success", "✓ Your proxy token: " + data.token);
-        } else {
-          showMsg("login-msg", "error", data.error || "Login failed. Check your credentials.");
-        }
-      } catch (e) {
-        showMsg("login-msg", "error", "Network error. Please try again.");
-      }
-
-      btn.disabled = false;
-      btn.textContent = "Log In";
-    }
-  </script>
+  // ── CLOCK ──
+  function tick() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+  }
+  tick();
+  setInterval(tick, 1000);
+</script>
 </body>
 </html>
