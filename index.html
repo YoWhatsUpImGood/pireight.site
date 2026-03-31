@@ -38,7 +38,6 @@
       opacity: 0.4;
     }
 
-    /* ── Gate ── */
     #site-gate {
       position: fixed;
       inset: 0;
@@ -116,7 +115,6 @@
       min-height: 1.2rem;
     }
 
-    /* ── Main Site ── */
     #site-main { display: none; }
 
     header {
@@ -246,12 +244,7 @@
     }
 
     .btn:hover { background: transparent; color: var(--white); }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--white);
-    }
-
+    .btn-outline { background: transparent; color: var(--white); }
     .btn-outline:hover { background: var(--white); color: var(--black); }
 
     .features {
@@ -263,11 +256,7 @@
       z-index: 1;
     }
 
-    .feature {
-      padding: 3rem;
-      border-right: 1px solid var(--border);
-    }
-
+    .feature { padding: 3rem; border-right: 1px solid var(--border); }
     .feature:last-child { border-right: none; }
 
     .feature-num {
@@ -287,11 +276,7 @@
       margin-bottom: 0.75rem;
     }
 
-    .feature p {
-      font-size: 0.875rem;
-      color: var(--grey-light);
-      line-height: 1.7;
-    }
+    .feature p { font-size: 0.875rem; color: var(--grey-light); line-height: 1.7; }
 
     .auth-section {
       padding: 6rem 3rem;
@@ -326,10 +311,8 @@
 
     .auth-tab:last-child { border-right: none; }
     .auth-tab.active { background: var(--white); color: var(--black); }
-
     .auth-form { display: none; }
     .auth-form.active { display: block; }
-
     .form-group { margin-bottom: 1.25rem; }
 
     label {
@@ -357,6 +340,14 @@
     }
 
     input:focus { border-color: var(--white); }
+
+    .invite-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--grey-light);
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+    }
 
     .tos-group {
       display: flex;
@@ -464,12 +455,7 @@
     }
 
     .modal-close:hover { color: var(--white); }
-
-    .modal-body {
-      padding: 2rem;
-      overflow-y: auto;
-      flex: 1;
-    }
+    .modal-body { padding: 2rem; overflow-y: auto; flex: 1; }
 
     .modal-body h3 {
       font-family: 'DM Mono', monospace;
@@ -481,13 +467,7 @@
     }
 
     .modal-body h3:first-child { margin-top: 0; }
-
-    .modal-body p, .modal-body li {
-      font-size: 0.85rem;
-      color: var(--grey-light);
-      line-height: 1.8;
-    }
-
+    .modal-body p, .modal-body li { font-size: 0.85rem; color: var(--grey-light); line-height: 1.8; }
     .modal-body ul { padding-left: 1.25rem; margin-top: 0.5rem; }
     .modal-body li { margin-bottom: 0.4rem; }
 
@@ -560,9 +540,9 @@
     <section class="hero">
       <div class="hero-grid"></div>
       <div class="hero-content">
-        <div class="hero-tag">// Secure — Accountable — Fast</div>
+        <div class="hero-tag">// Invite Only — Secure — Accountable</div>
         <h1>Pire<em>ight</em></h1>
-        <p class="hero-sub">A private proxy network built on accountability. Every connection tied to a verified account. Every request logged. Clean by design.</p>
+        <p class="hero-sub">A private proxy network by invitation only. Every connection tied to a verified account. Every request logged. Clean by design.</p>
         <div class="hero-cta">
           <a href="#auth" class="btn">Create Account</a>
           <a href="#" class="btn btn-outline" onclick="openTOS()">Read Terms</a>
@@ -573,8 +553,8 @@
     <section class="features" id="features">
       <div class="feature">
         <div class="feature-num">01</div>
-        <h3>Verified Accounts</h3>
-        <p>Every user is tied to a verified email address. Anonymous access is not permitted. Activity is traceable to its source.</p>
+        <h3>Invite Only</h3>
+        <p>Access is by invitation only. Every user is personally vetted before receiving an invite code to create an account.</p>
       </div>
       <div class="feature">
         <div class="feature-num">02</div>
@@ -595,7 +575,13 @@
           <button class="auth-tab" onclick="switchTab('login', this)">Log In</button>
         </div>
 
+        <!-- Signup -->
         <div class="auth-form active" id="form-signup">
+          <div class="form-group">
+            <label>Invite Code</label>
+            <input type="text" id="signup-invite" placeholder="XXXX-XXXX-XXXX" autocomplete="off" style="text-transform:uppercase;letter-spacing:0.15em;" />
+            <div class="invite-hint">You need an invite code to create an account.</div>
+          </div>
           <div class="form-group">
             <label>Email Address</label>
             <input type="email" id="signup-email" placeholder="you@example.com" />
@@ -616,6 +602,7 @@
           <div class="msg" id="signup-msg"></div>
         </div>
 
+        <!-- Login -->
         <div class="auth-form" id="form-login">
           <div class="form-group">
             <label>Email Address</label>
@@ -632,11 +619,11 @@
     </section>
 
     <footer>
-      <p>© 2026 Pireight.site — All rights reserved.</p>
+      <p>© 2026 Pireight.site — Invite Only</p>
       <p><a href="#" onclick="openTOS()" style="color:var(--grey-light);text-decoration:none;">Terms of Service</a></p>
     </footer>
 
-  </div><!-- end site-main -->
+  </div>
 
   <!-- TOS Modal -->
   <div class="modal-overlay" id="tos-modal">
@@ -648,10 +635,8 @@
       <div class="modal-body">
         <h3>1. Acceptance</h3>
         <p>By creating an account on Pireight.site ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service.</p>
-
         <h3>2. Account Responsibility</h3>
         <p>You are solely responsible for all activity that occurs under your account. Your account is personal and non-transferable. You must not share your credentials or token with any other person.</p>
-
         <h3>3. Prohibited Activities</h3>
         <p>The following activities are strictly prohibited and will result in immediate account termination and reporting to law enforcement:</p>
         <ul>
@@ -664,19 +649,14 @@
           <li>Copyright infringement at scale or for commercial gain</li>
           <li>Any activity that violates local, state, federal, or international law</li>
         </ul>
-
         <h3>4. Logging & Privacy</h3>
-        <p>All connections made through the Service are logged and associated with your verified account. Logs include timestamps, destination domains, and data volumes. These logs are retained for a minimum of 90 days and will be provided to law enforcement upon valid legal request.</p>
-
+        <p>All connections made through the Service are logged and associated with your verified account. Logs are retained for a minimum of 90 days and will be provided to law enforcement upon valid legal request.</p>
         <h3>5. Cooperation with Law Enforcement</h3>
-        <p>Pireight.site will fully cooperate with any valid legal process, including subpoenas, court orders, and law enforcement investigations. We reserve the right to proactively report suspected illegal activity without prior notice.</p>
-
+        <p>Pireight.site will fully cooperate with any valid legal process. We reserve the right to proactively report suspected illegal activity without prior notice.</p>
         <h3>6. Account Termination</h3>
         <p>We reserve the right to suspend or terminate any account at any time for any violation of these Terms without prior notice.</p>
-
-        <h3>7. Disclaimer of Warranties</h3>
+        <h3>7. Disclaimer</h3>
         <p>The Service is provided "as is" without warranty of any kind. Use at your own risk.</p>
-
         <h3>8. Changes to Terms</h3>
         <p>We reserve the right to update these Terms at any time. Last updated: March 2026.</p>
       </div>
@@ -698,26 +678,34 @@
       document.getElementById("gate-password").addEventListener("keydown", function(e) {
         if (e.key === "Enter") checkGate();
       });
+      document.getElementById("tos-modal").addEventListener("click", function(e) {
+        if (e.target === this) closeTOS();
+      });
+
+      // Auto format invite code input
+      document.getElementById("signup-invite").addEventListener("input", function() {
+        let val = this.value.replace(/[^A-Z0-9]/gi, "").toUpperCase();
+        if (val.length > 4) val = val.slice(0, 4) + "-" + val.slice(4);
+        if (val.length > 9) val = val.slice(0, 9) + "-" + val.slice(9);
+        if (val.length > 14) val = val.slice(0, 14);
+        this.value = val;
+      });
     });
 
     async function checkGate() {
       const password = document.getElementById("gate-password").value;
       const btn = document.getElementById("gate-btn");
       const err = document.getElementById("gate-error");
-
       if (!password) return;
-
       btn.disabled = true;
       btn.textContent = "Checking...";
       err.textContent = "";
-
       try {
         const res = await fetch(WORKER + "/api/site-login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ password })
         });
-
         if (res.ok) {
           sessionStorage.setItem("pireight_site_auth", "true");
           showSite();
@@ -729,7 +717,6 @@
       } catch (e) {
         err.textContent = "Connection error. Try again.";
       }
-
       btn.disabled = false;
       btn.textContent = "Enter";
     }
@@ -740,7 +727,6 @@
       document.title = "Pireight — Secure Proxy Network";
     }
 
-    // ── Tabs ──────────────────────────────────────────────────
     function switchTab(tab, el) {
       document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
       document.querySelectorAll(".auth-form").forEach(f => f.classList.remove("active"));
@@ -748,7 +734,6 @@
       el.classList.add("active");
     }
 
-    // ── TOS Modal ─────────────────────────────────────────────
     function openTOS() {
       document.getElementById("tos-modal").classList.add("open");
       document.body.style.overflow = "hidden";
@@ -759,25 +744,20 @@
       document.body.style.overflow = "";
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-      document.getElementById("tos-modal").addEventListener("click", function(e) {
-        if (e.target === this) closeTOS();
-      });
-    });
-
     function showMsg(id, type, text) {
       const el = document.getElementById(id);
       el.className = "msg " + type;
       el.textContent = text;
     }
 
-    // ── Signup ────────────────────────────────────────────────
     async function handleSignup() {
+      const invite = document.getElementById("signup-invite").value.trim();
       const email = document.getElementById("signup-email").value.trim();
       const password = document.getElementById("signup-password").value;
       const confirm = document.getElementById("signup-confirm").value;
       const tos = document.getElementById("tos-check").checked;
 
+      if (!invite) return showMsg("signup-msg", "error", "An invite code is required.");
       if (!email || !password || !confirm) return showMsg("signup-msg", "error", "All fields are required.");
       if (password.length < 8) return showMsg("signup-msg", "error", "Password must be at least 8 characters.");
       if (password !== confirm) return showMsg("signup-msg", "error", "Passwords do not match.");
@@ -791,7 +771,7 @@
         const res = await fetch(WORKER + "/api/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ email, password, invite })
         });
         const data = await res.json();
         if (res.ok) {
@@ -807,11 +787,9 @@
       btn.textContent = "Create Account";
     }
 
-    // ── Login ─────────────────────────────────────────────────
     async function handleLogin() {
       const email = document.getElementById("login-email").value.trim();
       const password = document.getElementById("login-password").value;
-
       if (!email || !password) return showMsg("login-msg", "error", "All fields are required.");
 
       const btn = document.querySelector("#form-login .form-btn");
