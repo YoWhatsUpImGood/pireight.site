@@ -1,16 +1,738 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Proxy Signup</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pireight — Secure Proxy Network</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f5f0;
+      --grey-dark: #1a1a1a;
+      --grey-mid: #2e2e2e;
+      --grey-light: #888;
+      --accent: #f5f5f0;
+      --border: #2e2e2e;
+      --error: #ff4444;
+      --success: #44ff88;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* Header */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 3rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.15em;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--grey-light);
+      font-size: 0.9rem;
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+
+    nav a {
+      color: var(--grey-light);
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-left: 2rem;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--white); }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8rem 3rem 4rem;
+      position: relative;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+    }
+
+    .hero-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey-light);
+      border: 1px solid var(--border);
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 12vw, 10rem);
+      line-height: 0.9;
+      letter-spacing: 0.04em;
+      color: var(--white);
+      animation: fadeUp 0.8s ease 0.1s both;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--grey-light);
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--grey-light);
+      max-width: 480px;
+      margin: 2rem auto 3rem;
+      line-height: 1.7;
+      animation: fadeUp 0.8s ease 0.2s both;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.8s ease 0.3s both;
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.9rem 2.5rem;
+      border: 1px solid var(--white);
+      background: var(--white);
+      color: var(--black);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: transparent;
+      color: var(--white);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+    }
+
+    .btn-outline:hover {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    /* Features strip */
+    .features {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature {
+      padding: 3rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .feature:last-child { border-right: none; }
+
+    .feature-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem;
+      color: var(--grey-mid);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .feature h3 {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 0.75rem;
+    }
+
+    .feature p {
+      font-size: 0.875rem;
+      color: var(--grey-light);
+      line-height: 1.7;
+    }
+
+    /* Auth section */
+    .auth-section {
+      padding: 6rem 3rem;
+      display: flex;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 1rem;
+      background: none;
+      border: none;
+      color: var(--grey-light);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-right: 1px solid var(--border);
+    }
+
+    .auth-tab:last-child { border-right: none; }
+    .auth-tab.active { background: var(--white); color: var(--black); }
+
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey-light);
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      background: var(--grey-dark);
+      border: 1px solid var(--border);
+      color: var(--white);
+      padding: 0.85rem 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus { border-color: var(--white); }
+
+    /* TOS checkbox */
+    .tos-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tos-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      accent-color: var(--white);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .tos-group label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--grey-light);
+      line-height: 1.5;
+      cursor: pointer;
+    }
+
+    .tos-group label a {
+      color: var(--white);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .form-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--white);
+      color: var(--black);
+      border: 1px solid var(--white);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .form-btn:hover { background: transparent; color: var(--white); }
+    .form-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .msg {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      display: none;
+    }
+
+    .msg.error { border: 1px solid var(--error); color: var(--error); display: block; }
+    .msg.success { border: 1px solid var(--success); color: var(--success); display: block; }
+
+    /* TOS Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--grey-dark);
+      border: 1px solid var(--border);
+      max-width: 640px;
+      width: 100%;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.1em;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--grey-light);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+
+    .modal-close:hover { color: var(--white); }
+
+    .modal-body {
+      padding: 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-body h3 {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin: 1.5rem 0 0.75rem;
+    }
+
+    .modal-body h3:first-child { margin-top: 0; }
+
+    .modal-body p, .modal-body li {
+      font-size: 0.85rem;
+      color: var(--grey-light);
+      line-height: 1.8;
+    }
+
+    .modal-body ul {
+      padding-left: 1.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .modal-body li { margin-bottom: 0.4rem; }
+
+    .modal-footer {
+      padding: 1.25rem 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    footer p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--grey-light);
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header { padding: 1.25rem 1.5rem; }
+      nav { display: none; }
+      .hero { padding: 7rem 1.5rem 3rem; }
+      .features { grid-template-columns: 1fr; }
+      .feature { border-right: none; border-bottom: 1px solid var(--border); }
+      .feature:last-child { border-bottom: none; }
+      .auth-section { padding: 4rem 1.5rem; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Create an Account</h1>
-  <form>
-    <input type="email" placeholder="Your email" required />
-    <input type="password" placeholder="Password" required />
-    <button type="submit">Sign Up</button>
-  </form>
-  <p>By signing up you agree to our Terms of Service.
-     Illegal activity is strictly prohibited.</p>
+
+  <!-- Header -->
+  <header>
+    <a href="#" class="logo">Pireight<span>// PROXY</span></a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#auth">Sign Up</a>
+      <a href="#" onclick="openTOS()">Terms</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-tag">// Secure — Accountable — Fast</div>
+      <h1>Pire<em>ight</em></h1>
+      <p class="hero-sub">A private proxy network built on accountability. Every connection tied to a verified account. Every request logged. Clean by design.</p>
+      <div class="hero-cta">
+        <a href="#auth" class="btn">Create Account</a>
+        <a href="#" class="btn btn-outline" onclick="openTOS()">Read Terms</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="feature">
+      <div class="feature-num">01</div>
+      <h3>Verified Accounts</h3>
+      <p>Every user is tied to a verified email address. Anonymous access is not permitted. Activity is traceable to its source.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">02</div>
+      <h3>Token Auth</h3>
+      <p>Access is granted via unique per-account tokens. Tokens can be revoked instantly for any violation of our terms.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-num">03</div>
+      <h3>Content Filtering</h3>
+      <p>Known illegal and malicious destinations are blocked at the network level. Abuse reports are acted on immediately.</p>
+    </div>
+  </section>
+
+  <!-- Auth -->
+  <section class="auth-section" id="auth">
+    <div class="auth-container">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('signup')">Sign Up</button>
+        <button class="auth-tab" onclick="switchTab('login')">Log In</button>
+      </div>
+
+      <!-- Signup -->
+      <div class="auth-form active" id="form-signup">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="signup-email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signup-password" placeholder="Min. 8 characters" />
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="signup-confirm" placeholder="Repeat password" />
+        </div>
+        <div class="tos-group">
+          <input type="checkbox" id="tos-check" />
+          <label for="tos-check">I have read and agree to the <a href="#" onclick="openTOS(); return false;">Terms of Service</a>. I understand that illegal activity is strictly prohibited and will result in immediate account termination and reporting to authorities.</label>
+        </div>
+        <button class="form-btn" onclick="handleSignup()">Create Account</button>
+        <div class="msg" id="signup-msg"></div>
+      </div>
+
+      <!-- Login -->
+      <div class="auth-form" id="form-login">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="login-email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="Your password" />
+        </div>
+        <button class="form-btn" onclick="handleLogin()">Log In</button>
+        <div class="msg" id="login-msg"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 Pireight.site — All rights reserved.</p>
+    <p><a href="#" onclick="openTOS()" style="color:var(--grey-light);text-decoration:none;">Terms of Service</a></p>
+  </footer>
+
+  <!-- TOS Modal -->
+  <div class="modal-overlay" id="tos-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Terms of Service</h2>
+        <button class="modal-close" onclick="closeTOS()">✕</button>
+      </div>
+      <div class="modal-body">
+        <h3>1. Acceptance</h3>
+        <p>By creating an account on Pireight.site ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Service.</p>
+
+        <h3>2. Account Responsibility</h3>
+        <p>You are solely responsible for all activity that occurs under your account. Your account is personal and non-transferable. You must not share your credentials or token with any other person.</p>
+
+        <h3>3. Prohibited Activities</h3>
+        <p>The following activities are strictly prohibited and will result in immediate account termination and reporting to law enforcement:</p>
+        <ul>
+          <li>Accessing, distributing, or transmitting child sexual abuse material (CSAM) in any form</li>
+          <li>Conducting or facilitating any form of cyberattack, including DDoS attacks, hacking, or unauthorized system access</li>
+          <li>Distributing malware, ransomware, spyware, or any malicious software</li>
+          <li>Fraud, phishing, or identity theft of any kind</li>
+          <li>Trafficking of illegal goods or substances via darknet markets or otherwise</li>
+          <li>Harassment, stalking, or threatening any individual</li>
+          <li>Copyright infringement at scale or for commercial gain</li>
+          <li>Any activity that violates local, state, federal, or international law</li>
+        </ul>
+
+        <h3>4. Logging & Privacy</h3>
+        <p>All connections made through the Service are logged and associated with your verified account. Logs include timestamps, destination domains, and data volumes. These logs are retained for a minimum of 90 days and will be provided to law enforcement upon valid legal request. By using the Service, you consent to this logging.</p>
+
+        <h3>5. Cooperation with Law Enforcement</h3>
+        <p>Pireight.site will fully cooperate with any valid legal process, including subpoenas, court orders, and law enforcement investigations. We will provide user account details, logs, and any other relevant data as required by law. We reserve the right to proactively report suspected illegal activity without prior notice.</p>
+
+        <h3>6. Content Filtering</h3>
+        <p>The Service employs automated content filtering to block access to known illegal and malicious destinations. This filtering is not exhaustive. The existence of filtering does not reduce your responsibility for your own actions.</p>
+
+        <h3>7. Account Termination</h3>
+        <p>We reserve the right to suspend or terminate any account at any time for any violation of these Terms, or for any activity we deem harmful to the Service or its users, without prior notice or refund.</p>
+
+        <h3>8. Disclaimer of Warranties</h3>
+        <p>The Service is provided "as is" without warranty of any kind. Pireight.site makes no guarantees regarding uptime, speed, or security. Use at your own risk.</p>
+
+        <h3>9. Limitation of Liability</h3>
+        <p>Pireight.site shall not be liable for any damages arising from your use of or inability to use the Service, including damages arising from illegal activity conducted by other users.</p>
+
+        <h3>10. Changes to Terms</h3>
+        <p>We reserve the right to update these Terms at any time. Continued use of the Service after changes constitutes acceptance of the new Terms. Last updated: March 2026.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeTOS()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    function switchTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+      document.getElementById('form-' + tab).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // TOS modal
+    function openTOS() {
+      document.getElementById('tos-modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTOS() {
+      document.getElementById('tos-modal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Close modal on overlay click
+    document.getElementById('tos-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeTOS();
+    });
+
+    function showMsg(id, type, text) {
+      const el = document.getElementById(id);
+      el.className = 'msg ' + type;
+      el.textContent = text;
+    }
+
+    // Signup
+    async function handleSignup() {
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-confirm').value;
+      const tos = document.getElementById('tos-check').checked;
+
+      if (!email || !password || !confirm) return showMsg('signup-msg', 'error', 'All fields are required.');
+      if (password.length < 8) return showMsg('signup-msg', 'error', 'Password must be at least 8 characters.');
+      if (password !== confirm) return showMsg('signup-msg', 'error', 'Passwords do not match.');
+      if (!tos) return showMsg('signup-msg', 'error', 'You must agree to the Terms of Service.');
+
+      const btn = document.querySelector('#form-signup .form-btn');
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+
+      try {
+        const res = await fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showMsg('signup-msg', 'success', '✓ Account created. Check your email to verify your address.');
+        } else {
+          showMsg('signup-msg', 'error', data.error || 'Signup failed. Try again.');
+        }
+      } catch (e) {
+        showMsg('signup-msg', 'error', 'Network error. Please try again.');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+    }
+
+    // Login
+    async function handleLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (!email || !password) return showMsg('login-msg', 'error', 'All fields are required.');
+
+      const btn = document.querySelector('#form-login .form-btn');
+      btn.disabled = true;
+      btn.textContent = 'Logging in...';
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showMsg('login-msg', 'success', `✓ Logged in. Your proxy token: ${data.token}`);
+        } else {
+          showMsg('login-msg', 'error', data.error || 'Login failed. Check your credentials.');
+        }
+      } catch (e) {
+        showMsg('login-msg', 'error', 'Network error. Please try again.');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Log In';
+    }
+  </script>
 </body>
 </html>
