@@ -27,7 +27,6 @@
       overflow: hidden;
     }
 
-    /* ── SCANLINE OVERLAY ── */
     body::after {
       content: '';
       position: fixed;
@@ -43,7 +42,6 @@
       z-index: 9999;
     }
 
-    /* ── NOISE TEXTURE ── */
     body::before {
       content: '';
       position: fixed;
@@ -54,14 +52,12 @@
       opacity: 0.4;
     }
 
-    /* ── LAYOUT ── */
     #app {
       display: grid;
       grid-template-rows: auto 1fr;
       height: 100vh;
     }
 
-    /* ── HEADER ── */
     header {
       border-bottom: 1px solid var(--border);
       padding: 0 2.5rem;
@@ -107,7 +103,6 @@
       font-weight: 500;
     }
 
-    /* corner deco */
     header::before {
       content: '';
       position: absolute;
@@ -127,7 +122,6 @@
       background: var(--fg);
     }
 
-    /* ── TABS ── */
     .tabs-bar {
       display: flex;
       border-bottom: 1px solid var(--border);
@@ -168,7 +162,6 @@
       background: var(--fg);
     }
 
-    /* ── MAIN CONTENT ── */
     main {
       overflow: hidden;
       position: relative;
@@ -181,7 +174,6 @@
 
     .page.active { display: flex; }
 
-    /* ── HOME PAGE ── */
     #page-home {
       align-items: center;
       justify-content: center;
@@ -290,7 +282,6 @@
 
     .home-about strong { color: var(--fg); }
 
-    /* ── PROJECTS PAGE ── */
     #page-projects {
       flex-direction: column;
       overflow: hidden;
@@ -331,7 +322,6 @@
     .projects-scroll::-webkit-scrollbar-track { background: var(--bg); }
     .projects-scroll::-webkit-scrollbar-thumb { background: var(--mid); }
 
-    /* ─── PROJECT CARD ─── */
     .project-card {
       border: 1px solid var(--border);
       padding: 1.5rem 2rem;
@@ -433,7 +423,6 @@
       50% { opacity: 0.3; }
     }
 
-    /* ── CONTACT PAGE ── */
     #page-contact {
       align-items: center;
       justify-content: center;
@@ -504,7 +493,6 @@
       text-transform: uppercase;
     }
 
-    /* ── CURSOR BLINK ── */
     .cursor {
       display: inline-block;
       width: 2px;
@@ -520,7 +508,6 @@
       50% { opacity: 0; }
     }
 
-    /* ── STATUS BAR ── */
     .status-bar {
       display: flex;
       justify-content: space-between;
@@ -548,26 +535,22 @@
 <body>
 <div id="app">
 
-  <!-- HEADER -->
   <header>
     <div class="header-left">
       <div class="site-name">PIREIGHT PROJECT</div>
-      <div class="site-sub">Personal Portfolio</div>
+      <div class="site-sub">Project Site</div>
     </div>
 
   </header>
 
-  <!-- TABS -->
   <div class="tabs-bar">
     <div class="tab active" data-target="home">// Home</div>
     <div class="tab" data-target="projects">// Projects</div>
     <div class="tab" data-target="contact">// Contact</div>
   </div>
 
-  <!-- MAIN -->
   <main>
 
-    <!-- HOME -->
     <div id="page-home" class="page active">
       <div class="home-glitch" data-text="PIREIGHT">PIREIGHT</div>
       <div class="home-divider"></div>
@@ -581,7 +564,6 @@
       </div>
     </div>
 
-    <!-- PROJECTS -->
     <div id="page-projects" class="page">
       <div class="projects-header">
         <h2>PROJECTS<span class="cursor"></span></h2>
@@ -600,16 +582,14 @@
             <div class="project-name">PIR8 CYBERDECK</div>
             <div class="project-desc">
               A physical cyberdeck build using a ThinkPad E420 housed in a gun case,
-              powered by a Raspberry Pi 5 running Kali Linux. Equipped with HackRF SDR
-              and LoRa modules for RF experimentation and off-grid comms. Full build
-              documented on GitHub Pages.
+              more to be added soon.
             </div>
             <div class="project-tags">
               <span class="tag">Hardware</span>
-              <span class="tag">Kali Linux</span>
-              <span class="tag">Raspberry Pi</span>
-              <span class="tag">SDR</span>
-              <span class="tag">LoRa</span>
+              <span class="tag">Linux</span>
+              <span class="tag"></span>
+              <span class="tag"></span>
+              <span class="tag"></span>
             </div>
           </div>
           <div class="project-meta">
@@ -626,7 +606,6 @@
       </div>
     </div>
 
-    <!-- CONTACT -->
     <div id="page-contact" class="page">
       <div class="contact-wrap">
         <div class="contact-heading">
@@ -650,7 +629,6 @@
 
   </main>
 
-  <!-- STATUS BAR -->
   <div class="status-bar">
     <div><span class="dot"></span><span id="status-text">SYSTEM ONLINE</span></div>
     <div id="clock"></div>
@@ -659,7 +637,6 @@
 </div>
 
 <script>
-  // ── TAB NAVIGATION ──
   const tabs = document.querySelectorAll('.tab');
   const pages = document.querySelectorAll('.page');
 
@@ -680,7 +657,6 @@
     });
   });
 
-  // ── PROJECT COUNT ──
   function updateCount() {
     const cards = document.querySelectorAll('.project-card').length;
     const padded = String(cards).padStart(2, '0');
@@ -688,7 +664,7 @@
   }
   updateCount();
 
-  // ── CLOCK ──
+  
   function tick() {
     const now = new Date();
     const h = String(now.getHours()).padStart(2,'0');
